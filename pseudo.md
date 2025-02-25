@@ -65,15 +65,11 @@ create_trie(FILE *file_path) :: node * // TODO: incomplete. Gives us an incomple
 # Profundidad del árbol
 
 ```
-count_trie(node *root, size_t level = 0) :: size_t
+count_trie(node *root, size_t total = 0) :: size_t
 {
-    if (!root.left && !root.right)
-        return level;
-    size_t left_depth = count_trie(root.left, level + 1);
-    size_t right_depth = count_trie(root.right, level + 1);
-    return left_depth > right_depth ? left_depth : right_depth;
+    total += 1;
+    if (root.left) total += count_trie(root.left);
+    if (root.right) total += count_trie(root.right);
+    return total;
 }
 ```
-
-
-//Esto es una prueba
