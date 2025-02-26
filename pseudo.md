@@ -52,7 +52,7 @@ insert_node(node *root, node *new) :: void  // Probablemente no necesite devolve
     }
 }
 
-create_trie(FILE *file_path) :: node * // TODO: incompleto. No crea un trie por niveles.
+create_trie(FILE *file_path) :: node *
 {
     // We crossreference the nodes in the pool
     node_pool nodes = {0}; // La piscina de nodos tiene solo el scope de esta función.
