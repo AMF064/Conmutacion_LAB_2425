@@ -1,5 +1,12 @@
 # Pseudocódigo
 
+## Por
+- Sergio Cruz Expósito: 100496315
+- Álvaro Masa Fernández: 100496239
+
+## Elección del algoritmo
+Nuestra elección inicial es el trie comprimido, pero estamos pensando en cambiar a trie LC en el futuro.
+
 ## Pasos
 1. Chequeamos el nº de argumentos de entrada
 2. Creamos el Patricia Trie con `create_trie`(FIB)
