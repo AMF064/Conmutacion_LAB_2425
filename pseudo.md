@@ -12,7 +12,8 @@ Nuestra elección inicial es el trie comprimido, pero estamos pensando en cambia
 2. Creamos el Patricia Trie con `create_trie`(FIB)
 3. Comprimimos el árbol con `compress_trie`
 4. Contamos el nº de nodos con `count_trie(root)`
-5. Realizamos el lookup(root,ip) a partir del InputPaketFile y creamos un archivo de salida con el nombre del
+5. Medimos tiempo con clock_gettime(CLOCK_MONOTONIC_RAW, &initialTime)
+6. Realizamos el lookup(root,ip) a partir del InputPaketFile y creamos un archivo de salida con el nombre del
 archivo de entrada .out
     - En este archivo para cada IP ponemos su interfaz de salida (si tiene) , nº nodos hasta conseguirla (idea: campo de nodo que denote el nivel) y tiempo de procesado separado por ;
     - Mientras se va creando el archivo también se van actualizando unas vbles que muestran un report al final del archivo que contiene la siguiente info:
@@ -22,7 +23,11 @@ archivo de entrada .out
         - Average packet processing time (nsecs)
         - Memory (Kbytes)
         - CPU Time (secs)
-6. Fin del programa
+7. Medimos tiempo con clock_gettime(CLOCK_MONOTONIC_RAW, &finalTime)
+8. Usamos la función printOutputLine(uint32_t IPAddress, int outInterface,
+		     struct timespec *initialTime, struct timespec *finalTime,
+		     double *searchingTime, int numberOfAccesses) o lo que ha hecho álvaro para escribir en el archivo de salida
+9. Fin del programa
 
 ## Posible f. de lookup:
 ```
