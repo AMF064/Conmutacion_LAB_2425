@@ -27,7 +27,12 @@ archivo de entrada .out
 8. Usamos la función printOutputLine(uint32_t IPAddress, int outInterface,
 		     struct timespec *initialTime, struct timespec *finalTime,
 		     double *searchingTime, int numberOfAccesses) o lo que ha hecho álvaro para escribir en el archivo de salida
-9. Fin del programa
+9. Usamos la función printSummary(int NumberOfNodesInTrie, int processedPackets, double averageNodeAccesses, double averagePacketProcessingTime) para escribir la primera parte del report final y la función printMemoryTimeUsage() para imprimir memory and CPU time del report final
+10. Fin del programa
+
+Nota: Tenemos que crear vbles y calcular los argumentos que le vamos a pasar a la función printSummary (punto 8)
+      También falta adaptar la función de lookup para hacer lookup de compress trie. Primero ver si funciona 
+      normal(para ello tiene que funcionar todo lo demás xD) 
 
 ## Posible f. de lookup:
 ```
