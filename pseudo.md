@@ -35,30 +35,31 @@ read_entire_file(FILE *file_path, node_pool *np) :: void
     freeIO();
 }
 
-insert_node(node *root, node *new) :: node *
+insert_node(node *root, node *new) :: void  // Probablemente no necesite devolver node *
 {
-    if (new.prefix_length < root.prefix_length) {
-        /* Swap */
-        node *tmp = root;
-        root = new;
-        new = tmp;
+    // Caso final: el nodo es el mismo que la raíz: completa con la iface de salida
+    if (root.prefix == new.prefix && root.prefix_length == new.prefix_length) {
+        root.next_hop = new.next_hop;
+        return;
     }
 
-    if (new.bit_that_matters == 1) // bit_that_matters será una máscara de bits, o un campo de bits en una estructura
-        root.right = new;
-    else
-        root.left = new;
-    return root;
+    if (new.bit_that_matters) {
+        if (!root.right) root.right = context_alloc(appropriate_node);
+        insert_node(root.right, new);
+    } else {
+        if (!root.left) root.left = context_alloc(appropriate_node);
+        insert_node(root.left, new);
+    }
 }
 
-create_trie(FILE *file_path) :: node * // TODO: incomplete. Gives us an incomplete trie.
+create_trie(FILE *file_path) :: node * // TODO: incompleto. No crea un trie por niveles.
 {
     // We crossreference the nodes in the pool
-    node_pool nodes = {0}; // The node pool registers the size
+    node_pool nodes = {0}; // La piscina de nodos tiene solo el scope de esta función.
     read_entire_file(file_path, &nodes);
-    node *root_candidate = nodes.items[0];
+    node *root = context_alloc(&(node) {0}); // La raíz va a ser 0.0.0.0/0. Alojada en otro contexto.
     for (auto i = 1; i < nodes.size; ++i)
-        root_candidate = insert_node(root_candidate, nodes[i]);
+        insert_node(root, nodes[i]);
 }
 ```
 
