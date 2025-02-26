@@ -93,7 +93,3 @@ archivo de entrada .out
         - Memory (Kbytes)
         - CPU Time (secs)
 6. Fin del programa
-
-
-
-
