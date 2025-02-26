@@ -77,22 +77,22 @@ count_trie(node *root, size_t total = 0) :: size_t      // Empezamos con 0 para 
 }
 ```
 
-# Pseudocódigo sin código 
-1 Chequeamos el nº de argumentos de entrada
-2 Creamos el Patricia Trie con create_trie(FIB)
-3 Comprimimos el árbol con compress_trie
-4 Contamos el nº de nodos con count_trie(root)
-5 Realizamos el lookup(root,ip) a partir del InputPaketFile y creamos un archivo de salida con el nombre del 
+## Pasos
+1. Chequeamos el nº de argumentos de entrada
+2. Creamos el Patricia Trie con `create_trie`(FIB)
+3. Comprimimos el árbol con `compress_trie`
+4. Contamos el nº de nodos con `count_trie(root)`
+5. Realizamos el lookup(root,ip) a partir del InputPaketFile y creamos un archivo de salida con el nombre del
 archivo de entrada .out
-En este archivo para cada IP ponemos su interfaz de salida (si tiene) , nº nodos hasta conseguirla (idea: campo de nodo que denote el nivel) y tiempo de procesado separado por ;
-Mientras se va creando el archivo también se van actualizando unas vbles que muestran un report al final del archivo que contiene la siguiente info:
-Number of nodes in the tree 
-Packets processed 
-Average node accesses
-Average packet processing time (nsecs) 
-Memory (Kbytes) 
-CPU Time (secs) 
-6 Fin del programa
+    - En este archivo para cada IP ponemos su interfaz de salida (si tiene) , nº nodos hasta conseguirla (idea: campo de nodo que denote el nivel) y tiempo de procesado separado por ;
+    - Mientras se va creando el archivo también se van actualizando unas vbles que muestran un report al final del archivo que contiene la siguiente info:
+        - Number of nodes in the tree
+        - Packets processed
+        - Average node accesses
+        - Average packet processing time (nsecs)
+        - Memory (Kbytes)
+        - CPU Time (secs)
+6. Fin del programa
 
 
 
