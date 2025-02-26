@@ -77,6 +77,20 @@ count_trie(node *root, size_t total = 0) :: size_t      // Empezamos con 0 para 
 }
 ```
 
+## Comprimir el árbol
+
+```
+compress_trie(node *root) :: cnode *
+{
+    cnode *alt_root = root; // Hay que adaptar el nodo
+    if (alt_root.left == NULL && alt_root.right == NULL) // Caso final
+        return alt_root;
+    if (alt_root.left != NULL && alt_root.right == NULL) { // Un solo hijo hacia la izquierda
+
+    }
+}
+```
+
 ## Pasos
 1. Chequeamos el nº de argumentos de entrada
 2. Creamos el Patricia Trie con `create_trie`(FIB)
