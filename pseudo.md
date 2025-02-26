@@ -39,14 +39,17 @@ insert_node(node *root, node *new) :: void  // Probablemente no necesite devolve
 {
     // Caso final: el nodo es el mismo que la raíz: completa con la iface de salida
     if (root.prefix == new.prefix && root.prefix_length == new.prefix_length) {
+        /* En este caso pasar la info de uno a otro */
         root.next_hop = new.next_hop;
         return;
     }
 
     if (new.bit_that_matters) {
+        /* Repetir el trabajo en la rama izquierda */
         if (!root.right) root.right = context_alloc(appropriate_node);
         insert_node(root.right, new);
     } else {
+        /* Repetir el trabajo en la rama derecha */
         if (!root.left) root.left = context_alloc(appropriate_node);
         insert_node(root.left, new);
     }
@@ -54,23 +57,22 @@ insert_node(node *root, node *new) :: void  // Probablemente no necesite devolve
 
 create_trie(FILE *file_path) :: node *
 {
-    // We crossreference the nodes in the pool
     node_pool nodes = {0}; // La piscina de nodos tiene solo el scope de esta función.
     read_entire_file(file_path, &nodes);
-    node *root = context_alloc(&(node) {0}); // La raíz va a ser 0.0.0.0/0. Alojada en otro contexto.
+    node *root = context_alloc(&(node) {0}); // root va a ser 0.0.0.0/0. Alojada en otro contexto.
     for (auto i = 1; i < nodes.size; ++i)
         insert_node(root, nodes[i]);
 }
 ```
 
-# Profundidad del árbol
+## Profundidad del árbol
 
 ```
-count_trie(node *root, size_t total = 0) :: size_t
+count_trie(node *root, size_t total = 0) :: size_t      // Empezamos con 0 para sumar 1 en root
 {
-    total += 1;
-    if (root.left) total += count_trie(root.left);
-    if (root.right) total += count_trie(root.right);
+    total += 1;                                         // Contar nodo actual
+    if (root.left) total += count_trie(root.left);      // Contar ramas a la izquierda
+    if (root.right) total += count_trie(root.right);    // Contar ramas a la derecha
     return total;
 }
 ```
