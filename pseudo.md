@@ -103,8 +103,15 @@ compress_trie(node *root) :: cnode *
     cnode *alt_root = root; // Hay que adaptar el nodo
     if (alt_root.left == NULL && alt_root.right == NULL) // Caso final
         return alt_root;
-    if (alt_root.left != NULL && alt_root.right == NULL) { // Un solo hijo hacia la izquierda
-
+    if (only_left_branch(alt_root) && does_not_have_iface(alt_root)) { // Solo rama izquierda y se puede comprimir
+        alt_root.next_hop = alt_root.left.next_hop;
+        alt_root.compressed_levels += 1;
+    } else if (only_right_branch(alt_root) && does_not_have_iface(alt_root) { //  Solo rama dcha y se puede comprimir
+        alt_root.next_hop = alt_root.right.next_hop;
+        alt_root.compressed_levels += 1;
+    } else { // Seguir probando con las ramas de abajo
+        compress_trie(alt_root.left);
+        compress_trie(alt_root.right);
     }
 }
 ```
