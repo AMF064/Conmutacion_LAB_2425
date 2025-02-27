@@ -65,7 +65,7 @@ Node *create_trie()
     Node *root = node_alloc();
     int result = OK;
     //while (result != REACHED_EOF) {
-    for (int i = 0; i < 2; ++i) { // Read only 1 for the moment
+    for (int i = 0; i < 2; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
