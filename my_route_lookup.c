@@ -38,6 +38,7 @@ void insert_node(Node *root, Node *new)
     }
 
     if (current_bit(*new, *root)) {
+        /* Reintentar inserción en rama derecha */
         if (!root->right) {
             root->right = node_alloc();
             root->right->prefix_length = root->prefix_length + 1;
@@ -45,6 +46,7 @@ void insert_node(Node *root, Node *new)
         }
         insert_node(root->right, new);
     } else {
+        /* Reintentar inserción en rama izquierda */
         if (!root->left) {
             root->left = node_alloc();
             root->left->prefix_length = root->prefix_length + 1;
