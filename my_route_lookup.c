@@ -70,15 +70,12 @@ Node *create_trie()
             printIOExplanationError(result);
             return root;
         }
-        Node *new_node = node_alloc();
-        *new_node = (Node) {
+        Node new_node = (Node) {
             .prefix = prefix,
             .prefix_length = pref_len,
             .out_iface = out_iface,
         };
-        if (!new_node)
-            return root;
-        insert_node(root, new_node);
+        insert_node(root, &new_node);
     }
     return root;
 }
