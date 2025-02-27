@@ -22,6 +22,10 @@ struct Node {
 Node *node_alloc(void)
 {
     Node *new = malloc(sizeof(Node));
+    if (!new) {
+        fprintf(stderr, "Buy more RAM lol\n");
+        exit(1);
+    }
     *new = (Node) { .out_iface = NO_IFACE };
     return new;
 }
