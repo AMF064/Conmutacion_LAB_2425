@@ -26,11 +26,11 @@ Node *node_alloc(void)
     return new;
 }
 
-#define current_bit(node, ref) (((node).prefix >> (32 - (ref).prefix_length)) & 1)
+#define current_bit(node, ref) (((node).prefix >> (31 - (ref).prefix_length)) & 1)
 void insert_node(Node *root, Node *new)
 {
-    uint32_t root_net_prefix = (root->prefix >> (32 - root->prefix_length)) & ((1 << root->prefix_length) - 1),
-             new_net_prefix = (new->prefix >> (32 - new->prefix_length)) & ((1 << new->prefix_length) - 1);
+    uint32_t root_net_prefix = (root->prefix >> (31 - root->prefix_length)) & ((1U << root->prefix_length) - 1),
+             new_net_prefix = (new->prefix >> (31 - new->prefix_length)) & ((1U << new->prefix_length) - 1);
     if (root->prefix_length == new->prefix_length &&
         root_net_prefix == new_net_prefix) {
         root->out_iface = new->out_iface;
@@ -42,7 +42,7 @@ void insert_node(Node *root, Node *new)
         if (!root->right) {
             root->right = node_alloc();
             root->right->prefix_length = root->prefix_length + 1;
-            root->right->prefix = root->prefix | (1 << (32 - root->prefix_length));
+            root->right->prefix = root->prefix | (1U << (31 - root->prefix_length));
         }
         insert_node(root->right, new);
     } else {
