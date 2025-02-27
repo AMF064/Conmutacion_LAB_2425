@@ -86,6 +86,7 @@ Node *create_trie()
 
 void print_trie(FILE *stream, Node *root, int level)
 {
+    fprintf(stream, "(%d) ", level);
     for (int i = 0; i < level; ++i)
         fputs("  ", stream);
     fprintf(stream, Node_Fmt "    Iface: %d\n", Node_Args(*root), root->out_iface);
