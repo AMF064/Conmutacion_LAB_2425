@@ -39,9 +39,8 @@ Nota: Tenemos que crear vbles y calcular los argumentos que le vamos a pasar a l
 [[nullable]] lookup(node root, ip) :: prefix
 {
     prefix result = nullptr;
-    if (root.left) result = lookup(root.left, ip);
     if (((ip >> current_bit) & 1) && !result && root.right) result = lookup(root.right, ip);
-    if (!((ip >> current_bit) & 1) && !result && root.left) result = lookup(root.left, ip);
+    else if (!((ip >> current_bit) & 1) && !result && root.left) result = lookup(root.left, ip);
     return result;
 }
 ```
@@ -79,7 +78,7 @@ insert_node(node *root, node *new) :: void  // Probablemente no necesite devolve
         return;
     }
 
-    if (new.bit_that_matters) {
+    if (!new.bit_that_matters) {
         /* Repetir el trabajo en la rama izquierda */
         if (!root.right) root.right = context_alloc(appropriate_node);
         insert_node(root.right, new);
@@ -100,7 +99,7 @@ create_trie(FILE *file_path) :: node *
 }
 ```
 
-## Profundidad del árbol
+## Contar nodos del árbol
 
 ```
 count_trie(node *root, size_t total = 0) :: size_t      // Empezamos con 0 para sumar 1 en root

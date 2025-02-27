@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <sys/time.h>
+#include <time.h>
 #include <sys/resource.h>
 #include <unistd.h>
 #include <stdarg.h>
