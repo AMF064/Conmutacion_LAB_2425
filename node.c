@@ -1,5 +1,6 @@
 #include "node.h"
 #include "io.h"
+#include "utils.h"  
 
 int node_count = 0;
 
@@ -15,6 +16,7 @@ Node *node_alloc(void)
 }
 
 #define current_bit(node, ref) (((node).prefix >> (31 - (ref).prefix_length)) & 1)
+#define current_bit_from_ip(ip, node) (((ip) >> (31 - (node).prefix_length)) & 1)
 void insert_node(Node *root, Node *new)
 {
     uint32_t root_net_prefix = (root->prefix >> (31 - root->prefix_length)) & ((1U << root->prefix_length) - 1),
@@ -113,6 +115,34 @@ Node* compress_trie(Node *node) {
     }
 
     return node; // nodo con out_iface o 2 hijos
+}
+
+int lookup(Node *root, uint32_t ip, int *accesses) {
+    int best_iface = NO_IFACE;
+    Node *node = root;
+    while (node) {
+        (*accesses)++;
+        int mask;
+        getNetmask(node->prefix_length, &mask); //utils
+
+        // Verificamos si el prefijo del nodo coincide con la IP
+        if ((ip & mask) == (node->prefix & mask)) {
+            
+            if (node->out_iface != NO_IFACE) {//tiene interfaz
+                best_iface = node->out_iface;
+            }
+            //seguimos avanzando
+            if (current_bit_from_ip(ip, *node) == 0) {
+                node = node->left;
+            } else {
+                node = node->right;
+            }
+        } else {
+            //prefijo no coincide...
+            break;
+        }
+    }
+    return best_iface;
 }
 
 
