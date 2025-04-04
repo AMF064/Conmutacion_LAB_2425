@@ -46,12 +46,14 @@ Node *create_trie()
 {
     Node *root = node_alloc();
     int result = OK;
-    while (result != REACHED_EOF) {
+    for (;;) {
     //for (int i = 0; i < 2; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
         result = readFIBLine(&prefix, &pref_len, &out_iface);
+        if (result == REACHED_EOF)
+            break;
         if (result < 0) {
             printIOExplanationError(result);
             return root;
