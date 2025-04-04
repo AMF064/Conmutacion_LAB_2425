@@ -3,13 +3,49 @@
 #include "io.h"
 #include "node.h"
 
-#define INPUT_FILE_PATH "prueba1.txt"
-#define ROUTING_FILE_PATH "routing_table.txt"
-int main(void)
+typedef struct {
+    char *fib_file;
+    char *input_packet_file;
+} Args;
+
+void usage(char *cmd, char *errmsg)
 {
+    fprintf(stderr, "Usage: %s <FIB> <InputPacketFile>\n", cmd);
+    fputs(errmsg, stderr);
+}
+
+char *shift(int *ac, char ***av)
+{
+    char *result = **av;
+    *av += 1;
+    *ac -= 1;
+    return result;
+}
+
+int parse_cmdline_opts(int argc, char **argv, Args *args)
+{
+    char *command = shift(&argc, &argv);
+    if (!argc) {
+        usage(command, "ERROR: no files provided\n");
+        return -1;
+    }
+    args->fib_file = shift(&argc, &argv);
+    if (!argc) {
+        usage(command, "ERROR: no input packet file provided\n");
+        return -1;
+    }
+    args->input_packet_file = shift(&argc, &argv);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    Args args = {0};
+    if (parse_cmdline_opts(argc, argv, &args) < 0)
+        return 1;
     int return_value = 0;
-    char routing_file_path[] = ROUTING_FILE_PATH;
-    char input_file[] = INPUT_FILE_PATH;
+    char *routing_file_path = args.fib_file;
+    char *input_file = args.input_packet_file;
     int result = initializeIO(routing_file_path, input_file);
     if (result < 0) {
         printIOExplanationError(result);
