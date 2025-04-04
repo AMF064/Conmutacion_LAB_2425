@@ -87,6 +87,34 @@ void print_trie(FILE *stream, Node *root, int level)
     if (root->right) print_trie(stream, root->right, level + 1);
 }
 
+Node* compress_trie(Node *node) {
+    if (!node) return NULL;
+
+    node->left = compress_trie(node->left);
+    node->right = compress_trie(node->right);
+
+    if (!node->left && !node->right)
+        return node;
+
+    // Nodo sin interfaz y con un único hijo: eliminamos
+    if (node->out_iface == NO_IFACE) {
+        if (node->left && !node->right) {
+            Node *child = node->left;
+            free(node);
+            node_count--;
+            return child;
+        }
+        if (node->right && !node->left) {
+            Node *child = node->right;
+            free(node);
+            node_count--;
+            return child;
+        }
+    }
+
+    return node; // nodo con out_iface o 2 hijos
+}
+
 void make_graph(FILE *stream, Node *root, int level)
 {
     if (!level) {
