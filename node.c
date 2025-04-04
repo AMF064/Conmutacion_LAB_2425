@@ -53,7 +53,7 @@ Node *create_trie()
         int result = readFIBLine(&prefix, &pref_len, &out_iface);
         if (result == REACHED_EOF)
             break;
-        if (result < 0) {
+        else if (result < 0) {
             printIOExplanationError(result);
             return root;
         }
