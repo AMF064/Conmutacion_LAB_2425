@@ -1,6 +1,8 @@
 #include "node.h"
 #include "io.h"
 
+int node_count = 0;
+
 Node *node_alloc(void)
 {
     Node *new = malloc(sizeof(Node));
@@ -83,6 +85,34 @@ void free_nodes(Node *root)
     if (root->right) free_nodes(root->right);
     free(root);
     root = NULL;
+}
+
+Node* compress_trie(Node *node) {
+    if (!node) return NULL;
+
+    node->left = compress_trie(node->left);
+    node->right = compress_trie(node->right);
+
+    if (!node->left && !node->right)
+        return node;
+
+    // Nodo sin interfaz y con un único hijo: eliminamos
+    if (node->out_iface == NO_IFACE) {
+        if (node->left && !node->right) {
+            Node *child = node->left;
+            free(node);  
+            node_count--;
+            return child; 
+        }
+        if (node->right && !node->left) {
+            Node *child = node->right;
+            free(node);
+            node_count--;
+            return child;
+        }
+    }
+
+    return node; // nodo con out_iface o 2 hijos
 }
 
 
