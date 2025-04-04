@@ -26,7 +26,9 @@ struct Node {
 Node *node_alloc(void);
 void insert_node(Node *root, Node *new);
 Node *create_trie();
-void print_trie(FILE *stream, Node *root, int level);
 void free_nodes(Node *root);
 Node* compress_trie(Node *node);
+void make_graph(FILE *stream, Node *root, int level);
+int output_graphviz(const char *gv_file_path, Node *root);
+void print_trie(FILE *stream, Node *root, int level);
 #endif // NODE_H

@@ -57,7 +57,8 @@ int main(int argc, char *argv[])
         goto out;
     }
 
-    print_trie(stdout, root, 0);
+    if (output_graphviz("out.gv", root) < 0)
+        perror("fopen");
 
 out:
     free_nodes(root);
