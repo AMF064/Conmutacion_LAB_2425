@@ -29,4 +29,5 @@ Node *create_trie();
 void print_trie(FILE *stream, Node *root, int level);
 void free_nodes(Node *root);
 Node* compress_trie(Node *node);
+int lookup(Node *root, uint32_t ip, int *accesses);
 #endif // NODE_H
