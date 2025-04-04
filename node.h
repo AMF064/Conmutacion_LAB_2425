@@ -6,6 +6,8 @@
 
 #define NO_IFACE -1
 
+extern int node_count;
+
 typedef struct Node Node;
 struct Node {
     int prefix_length;
@@ -26,4 +28,5 @@ void insert_node(Node *root, Node *new);
 Node *create_trie();
 void print_trie(FILE *stream, Node *root, int level);
 void free_nodes(Node *root);
+Node* compress_trie(Node *node);
 #endif // NODE_H
