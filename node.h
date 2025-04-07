@@ -29,6 +29,7 @@ Node *create_trie();
 void free_nodes(Node *root);
 void make_graph(FILE *stream, Node *root, int level);
 Node* compress_trie(Node *node);
+int lookup(Node *root, uint32_t ip, int *accesses);
 int output_graphviz(const char *gv_file_path, Node *root);
 void print_trie(FILE *stream, Node *root, int level);
 #endif // NODE_H
