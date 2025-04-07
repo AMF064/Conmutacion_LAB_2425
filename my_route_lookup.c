@@ -1,7 +1,15 @@
+#ifndef _POSIX_C_SOURCE 
+#define _POSIX_C_SOURCE 200809L   
+#endif
 #include <assert.h>
 #include <stdint.h>
 #include "io.h"
 #include "node.h"
+
+//En mi caso es necesario que lo primero sea definir _POSIX_C_SOURCE 200809L para usar funciones POSIX de nivel 2008 o superior.
+//asi el compilador no da error en la función gettime() ni en la macro CLOCK_MONOTONIC_RAW
+
+extern int node_count;
 
 typedef struct {
     char *fib_file;
@@ -56,6 +64,41 @@ int main(int argc, char *argv[])
         return_value = 1;
         goto out;
     }
+
+    root = compress_trie(root);
+    uint32_t ip;
+    int iface, accesses;
+    int processed_packets = 0;
+    double total_accesses = 0;
+    double total_time = 0;
+    double searching_time = 0.0;
+    struct timespec start, end;
+
+
+    while (readInputPacketFileLine(&ip) == OK) {
+        accesses = 0;
+
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+        iface = lookup(root, ip, &accesses);
+        clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+        printOutputLine(ip, iface, &start, &end, &searching_time, accesses);
+
+        total_accesses += accesses;
+        total_time += searching_time;
+        processed_packets++;
+    }
+
+    //Estadísticas finales
+    double average_accesses = 0;
+    double average_time = 0;
+    
+    if (processed_packets > 0) {
+        average_accesses = total_accesses / processed_packets;
+        average_time = total_time / processed_packets;
+    }
+    printSummary(node_count, processed_packets, average_accesses, average_time);
+
 
     if (output_graphviz("out.gv", root) < 0)
         perror("fopen");
