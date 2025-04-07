@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define NO_IFACE -1
+#define NO_IFACE 0
 
 extern int node_count;
 
