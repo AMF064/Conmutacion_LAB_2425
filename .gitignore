@@ -1,2 +1,5 @@
 *.out
+*.[oa]
 my_route_lookup
+*.gv
+*.png

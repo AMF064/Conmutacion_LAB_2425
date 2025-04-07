@@ -49,8 +49,8 @@ void insert_node(Node *root, Node *new)
 Node *create_trie()
 {
     Node *root = node_alloc();
-    for (;;) {
-    //for (int i = 0; i < 2; ++i) {
+    //for (;;) {
+    for (int i = 0; i < 10; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
@@ -71,6 +71,14 @@ Node *create_trie()
     return root;
 }
 
+void free_nodes(Node *root)
+{
+    if (root->left) free_nodes(root->left);
+    if (root->right) free_nodes(root->right);
+    free(root);
+    root = NULL;
+}
+
 void print_trie(FILE *stream, Node *root, int level)
 {
     fprintf(stream, "(%d) ", level);
@@ -79,14 +87,6 @@ void print_trie(FILE *stream, Node *root, int level)
     fprintf(stream, Node_Fmt "    Iface: %d\n", Node_Args(*root), root->out_iface);
     if (root->left) print_trie(stream, root->left, level + 1);
     if (root->right) print_trie(stream, root->right, level + 1);
-}
-
-void free_nodes(Node *root)
-{
-    if (root->left) free_nodes(root->left);
-    if (root->right) free_nodes(root->right);
-    free(root);
-    root = NULL;
 }
 
 Node* compress_trie(Node *node) {
@@ -102,9 +102,9 @@ Node* compress_trie(Node *node) {
     if (node->out_iface == NO_IFACE) {
         if (node->left && !node->right) {
             Node *child = node->left;
-            free(node);  
+            free(node);
             node_count--;
-            return child; 
+            return child;
         }
         if (node->right && !node->left) {
             Node *child = node->right;
@@ -116,6 +116,7 @@ Node* compress_trie(Node *node) {
 
     return node; // nodo con out_iface o 2 hijos
 }
+
 
 int lookup(Node *root, uint32_t ip, int *accesses) {
     int best_iface = NO_IFACE;
@@ -145,4 +146,54 @@ int lookup(Node *root, uint32_t ip, int *accesses) {
     return best_iface;
 }
 
+void make_graph(FILE *stream, Node *root, int level)
+{
+    if (!level) {
+        fprintf(stream, "digraph G {\n");
+    }
 
+    enum { BOTH, ONE, NONE } state = BOTH;
+
+    if (!root->left && !root->right)
+        state = NONE;
+    else if ((root->left && !root->right) || (!root->left && root->right))
+        state = ONE;
+    else
+        state = BOTH;
+
+    if (state == BOTH)
+        fprintf(stream, "\""Node_Fmt" * %d\" -> { ", Node_Args(*root), root->out_iface);
+    else if (state == ONE)
+        fprintf(stream, "\"" Node_Fmt " * %d\" -> ", Node_Args(*root), root->out_iface);
+    else
+        fprintf(stream, "\""Node_Fmt" * %d\"\n", Node_Args(*root), root->out_iface);
+
+    if (root->left)
+        fprintf(stream, "\""Node_Fmt" * %d\"", Node_Args(*root->left), root->left->out_iface);
+    if (state == BOTH)
+        fprintf(stream, ", ");
+    if (root->right)
+        fprintf(stream, "\""Node_Fmt" * %d\"", Node_Args(*root->right), root->right->out_iface);
+
+    if (state == BOTH) fprintf(stream, "}\n");
+    else fprintf(stream, "\n");
+
+    if (root->left) make_graph(stream, root->left, level + 1);
+    if (root->right) make_graph(stream, root->right, level + 1);
+
+    if (!level) {
+        fprintf(stream, "}\n");
+    }
+}
+
+int output_graphviz(const char *gv_file_path, Node *root)
+{
+    FILE *stream = fopen(gv_file_path, "w");
+    if (!stream) {
+        fprintf(stderr, "ERROR: could not open GraphViz file\n");
+        return -1;
+    }
+    make_graph(stream, root, 0);
+    fclose(stream);
+    return 0;
+}
