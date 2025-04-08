@@ -1,6 +1,6 @@
 #include "node.h"
 #include "io.h"
-#include "utils.h"  
+#include "utils.h"
 
 int node_count = 0;
 
@@ -122,13 +122,12 @@ int lookup(Node *root, uint32_t ip, int *accesses) {
     int best_iface = NO_IFACE;
     Node *node = root;
     while (node) {
-        (*accesses)++;
+        *accesses += 1;
         int mask;
         getNetmask(node->prefix_length, &mask); //utils
 
         // Verificamos si el prefijo del nodo coincide con la IP
         if ((ip & mask) == (node->prefix & mask)) {
-            
             if (node->out_iface != NO_IFACE) {//tiene interfaz
                 best_iface = node->out_iface;
             }
