@@ -4,6 +4,10 @@
 
 int node_count = 0;
 
+/**********************************************************************
+ * Allocate a node.
+ * No args.
+ **********************************************************************/
 Node *node_alloc(void)
 {
     Node *new = malloc(sizeof(Node));
@@ -15,6 +19,15 @@ Node *node_alloc(void)
     return new;
 }
 
+/**********************************************************************
+ * RECURSIVE FUNCTION
+ * Insert a new node as the left/right subtree of another one
+ * Args:
+ *  - Node *root: the root of the current SUBTREE (it does not have to
+ *  be the root of the whole tree, since this function is called
+ *  recursively.
+ *  - Node *new: the new node to be inserted in the tree.
+ **********************************************************************/
 #define current_bit(node, ref) (((node).prefix >> (31 - (ref).prefix_length)) & 1)
 #define current_bit_from_ip(ip, node) (((ip) >> (31 - (node).prefix_length)) & 1)
 void insert_node(Node *root, Node *new)
@@ -46,6 +59,12 @@ void insert_node(Node *root, Node *new)
     }
 }
 
+/**********************************************************************
+ * WARNING: THIS FUNCTION ALLOCATES MEMORY
+ * Create the Patricia trie, uncompressed.
+ * Read the nodes one by one from the FIB, and put them on the tree.
+ * No arguments.
+ **********************************************************************/
 Node *create_trie()
 {
     Node *root = node_alloc();
@@ -71,6 +90,9 @@ Node *create_trie()
     return root;
 }
 
+/**********************************************************************
+ * Free the tree from the root to the leaves.
+ **********************************************************************/
 void free_nodes(Node *root)
 {
     if (root->left) free_nodes(root->left);
@@ -79,6 +101,9 @@ void free_nodes(Node *root)
     root = NULL;
 }
 
+/**********************************************************************
+ * Print the trie. OBSOLETE. We cannot see anything with this function
+ **********************************************************************/
 void print_trie(FILE *stream, Node *root, int level)
 {
     fprintf(stream, "(%d) ", level);
@@ -89,6 +114,10 @@ void print_trie(FILE *stream, Node *root, int level)
     if (root->right) print_trie(stream, root->right, level + 1);
 }
 
+/**********************************************************************
+ * Compress a Patricia trie. Get rid of the in-between nodes if they
+ * do not correspond to a next hop and they only have one subtree.
+ **********************************************************************/
 Node* compress_trie(Node *node) {
     if (!node) return NULL;
 
@@ -118,6 +147,15 @@ Node* compress_trie(Node *node) {
 }
 
 
+/**********************************************************************
+ * Look up the next hop corresponding to an IP. Returns 0 if it
+ * did not find one.
+ * Args:
+ *  - Node *root: the absolute root of the trie.
+ *  - uint32_t ip: the IP for which to look up a next hop.
+ *  - int *accesses: variable declared outside the function to keep
+ *  track of the number of memory acesses.
+ **********************************************************************/
 int lookup(Node *root, uint32_t ip, int *accesses) {
     int best_iface = NO_IFACE;
     Node *node = root;
@@ -149,6 +187,17 @@ int lookup(Node *root, uint32_t ip, int *accesses) {
     return best_iface;
 }
 
+/**********************************************************************
+ * RECURSIVE FUNCTION
+ * Output the trie to a file in graphviz format, to be processed with
+ * the `dot` command-line utility
+ * Args:
+ *  - FILE *stream: an opened FILE *. No need to handle it here.
+ *  - Node *root: the relative root of the current tree.
+ *  - int level: it is a closure. The function behaves differently
+ *  depending on its value. If it is 0, it prints the opening and
+ *  closing curly braces of the format.
+ **********************************************************************/
 void make_graph(FILE *stream, Node *root, int level)
 {
     if (!level) {
@@ -189,6 +238,10 @@ void make_graph(FILE *stream, Node *root, int level)
     }
 }
 
+/**********************************************************************
+ * Wrapper of the above `make_graph` function, in charge of opening
+ * the file and handling errors.
+ **********************************************************************/
 int output_graphviz(const char *gv_file_path, Node *root)
 {
     FILE *stream = fopen(gv_file_path, "w");
