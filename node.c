@@ -1,6 +1,6 @@
 #include "node.h"
 #include "io.h"
-#include "utils.h"  
+#include "utils.h"
 
 int node_count = 0;
 
@@ -49,8 +49,8 @@ void insert_node(Node *root, Node *new)
 Node *create_trie()
 {
     Node *root = node_alloc();
-    //for (;;) {
-    for (int i = 0; i < 10; ++i) {
+    for (;;) {
+    //for (int i = 0; i < 10; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
@@ -132,7 +132,7 @@ int lookup(Node *root, uint32_t ip, int *accesses) {
 
         // Verificamos si el prefijo del nodo coincide con la IP
         if ((ip & mask) == (node->prefix & mask)) {
-            
+
             if (node->out_iface != NO_IFACE) {//tiene interfaz
                 best_iface = node->out_iface;
             }

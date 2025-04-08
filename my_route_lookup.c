@@ -1,5 +1,5 @@
-#ifndef _POSIX_C_SOURCE 
-#define _POSIX_C_SOURCE 200809L   
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
 #endif
 #include <assert.h>
 #include <stdint.h>
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     //Estadísticas finales
     double average_accesses = 0;
     double average_time = 0;
-    
+
     if (processed_packets > 0) {
         average_accesses = total_accesses / processed_packets;
         average_time = total_time / processed_packets;
