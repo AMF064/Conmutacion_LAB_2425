@@ -49,8 +49,8 @@ void insert_node(Node *root, Node *new)
 Node *create_trie()
 {
     Node *root = node_alloc();
-    //for (;;) {
-    for (int i = 0; i < 10; ++i) {
+    for (;;) {
+    //for (int i = 0; i < 10; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
@@ -124,7 +124,11 @@ int lookup(Node *root, uint32_t ip, int *accesses) {
     while (node) {
         *accesses += 1;
         int mask;
-        getNetmask(node->prefix_length, &mask); //utils
+        getNetmask(node->prefix_length, (int *)&mask); //utils
+
+         if (node->prefix_length == 0) {
+            mask = 0x00000000;  // Protege contra desplazamiento ilegal(necesario por funcion getNetmask)
+        }
 
         // Verificamos si el prefijo del nodo coincide con la IP
         if ((ip & mask) == (node->prefix & mask)) {
