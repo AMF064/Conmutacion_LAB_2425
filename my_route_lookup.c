@@ -1,5 +1,5 @@
-#ifndef _POSIX_C_SOURCE 
-#define _POSIX_C_SOURCE 200809L   
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
 #endif
 #include <assert.h>
 #include <stdint.h>
@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
     Args args = {0};
     if (parse_cmdline_opts(argc, argv, &args) < 0)
         return 1;
-    int return_value = 0;
     char *routing_file_path = args.fib_file;
     char *input_file = args.input_packet_file;
     int result = initializeIO(routing_file_path, input_file);
@@ -61,9 +60,18 @@ int main(int argc, char *argv[])
     }
     Node *root = create_trie();
     if (!root) {
-        return_value = 1;
-        goto out;
+        free_nodes(root);
+        freeIO();
+        return 1;
     }
+
+#ifdef DEBUG
+    if (output_graphviz("out_uncompressed.gv", root) < 0) {
+        free_nodes(root);
+        freeIO();
+        return 1;
+    }
+#endif
 
     root = compress_trie(root);
     uint32_t ip;
@@ -92,7 +100,7 @@ int main(int argc, char *argv[])
     //Estadísticas finales
     double average_accesses = 0;
     double average_time = 0;
-    
+
     if (processed_packets > 0) {
         average_accesses = total_accesses / processed_packets;
         average_time = total_time / processed_packets;
@@ -100,10 +108,13 @@ int main(int argc, char *argv[])
     printSummary(node_count, processed_packets, average_accesses, average_time);
 
 
-    if (output_graphviz("out.gv", root) < 0)
-        perror("fopen");
+    int return_value = 0;
+#ifdef DEBUG
+    if (output_graphviz("out_compressed.gv", root) < 0)
+        return_value = 1;
+#endif
 
-out:
+
     free_nodes(root);
     freeIO();
     return return_value;
