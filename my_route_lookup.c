@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
     Args args = {0};
     if (parse_cmdline_opts(argc, argv, &args) < 0)
         return 1;
-    int return_value = 0;
     char *routing_file_path = args.fib_file;
     char *input_file = args.input_packet_file;
     int result = initializeIO(routing_file_path, input_file);
@@ -65,6 +64,14 @@ int main(int argc, char *argv[])
         freeIO();
         return 1;
     }
+
+#ifdef DEBUG
+    if (output_graphviz("out_uncompressed.gv", root) < 0) {
+        free_nodes(root);
+        freeIO();
+        return 1;
+    }
+#endif
 
     root = compress_trie(root);
     uint32_t ip;
@@ -101,8 +108,11 @@ int main(int argc, char *argv[])
     printSummary(node_count, processed_packets, average_accesses, average_time);
 
 
-    if (output_graphviz("out.gv", root) < 0)
+    int return_value = 0;
+#ifdef DEBUG
+    if (output_graphviz("out_compressed.gv", root) < 0)
         return_value = 1;
+#endif
 
 
     free_nodes(root);
