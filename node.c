@@ -132,13 +132,13 @@ Node* compress_trie(Node *node) {
         if (node->left && !node->right) {
             Node *child = node->left;
             free(node);
-            node_count--;
+            node_count += 1;
             return child;
         }
         if (node->right && !node->left) {
             Node *child = node->right;
             free(node);
-            node_count--;
+            node_count += 1;
             return child;
         }
     }
