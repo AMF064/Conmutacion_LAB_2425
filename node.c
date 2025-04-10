@@ -241,6 +241,8 @@ void make_graph(FILE *stream, Node *root, int level)
 /**********************************************************************
  * Wrapper of the above `make_graph` function, in charge of opening
  * the file and handling errors.
+ * THIS FUNCTION PRODUCES LOGS. There is no need to print errors in
+ * user code.
  **********************************************************************/
 int output_graphviz(const char *gv_file_path, Node *root)
 {
@@ -250,6 +252,6 @@ int output_graphviz(const char *gv_file_path, Node *root)
         return -1;
     }
     make_graph(stream, root, 0);
-    fclose(stream);
+    fclose(stream);  // We do not care about the errors at this point.
     return 0;
 }

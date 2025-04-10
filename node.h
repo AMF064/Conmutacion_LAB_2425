@@ -87,6 +87,8 @@ int lookup(Node *root, uint32_t ip, int *accesses);
  * CALLS A RECURSIVE FUNCTION: make_graph
  * Output the trie to a file in graphviz format, to be processed with
  * the `dot` command-line utility
+ * THIS FUNCTION PRODUCES LOGS. There is no need to print errors in
+ * user code.
  * Args:
  *  - const char *gv_file_path: file path of the graphviz file path.
  *  - Node *root: the relative root of the current tree.
