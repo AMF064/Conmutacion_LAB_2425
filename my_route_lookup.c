@@ -61,8 +61,9 @@ int main(int argc, char *argv[])
     }
     Node *root = create_trie();
     if (!root) {
-        return_value = 1;
-        goto out;
+        free_nodes(root);
+        freeIO();
+        return 1;
     }
 
     root = compress_trie(root);
@@ -101,9 +102,9 @@ int main(int argc, char *argv[])
 
 
     if (output_graphviz("out.gv", root) < 0)
-        perror("fopen");
+        return_value = 1;
 
-out:
+
     free_nodes(root);
     freeIO();
     return return_value;
