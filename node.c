@@ -159,7 +159,7 @@ Node* compress_trie(Node *node) {
 int lookup(Node *root, uint32_t ip, int *accesses) {
     int best_iface = NO_IFACE;
     Node *node = root;
-    while (node) {
+    while (node && best_iface == NO_IFACE) {
         *accesses += 1;
         int mask;
         getNetmask(node->prefix_length, (int *)&mask); //utils
