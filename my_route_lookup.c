@@ -58,16 +58,16 @@ int main(int argc, char *argv[])
         printIOExplanationError(result);
         return 1;
     }
-    Node *root = create_trie();
+    node_t root = create_trie();
     if (!root) {
-        free_nodes(root);
+        free_nodes();
         freeIO();
         return 1;
     }
 
 #ifdef DEBUG
     if (output_graphviz("out_uncompressed.gv", root) < 0) {
-        free_nodes(root);
+        free_nodes();
         freeIO();
         return 1;
     }
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-    free_nodes(root);
+    free_nodes();
     freeIO();
     return return_value;
 }
