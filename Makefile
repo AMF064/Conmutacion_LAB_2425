@@ -1,6 +1,6 @@
 SRC := my_route_lookup.c io.c utils.c node.c
 INC := io.h utils.h node.h
-CFLAGS = -Wall -Wextra -pedantic -std=c11 -O2
+CFLAGS = -Wall -Wextra -pedantic -std=c11 -ggdb -fsanitize=address
 
 all: my_route_lookup
 
