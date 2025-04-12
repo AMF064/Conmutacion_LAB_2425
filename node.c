@@ -16,7 +16,6 @@ union Node_Chunk {
 #define DEFAULT_CAPACITY 4096
 typedef struct Node_Block Node_Block;
 struct Node_Block {
-    Node_Chunk *alloc;
     Node_Chunk *chunks;
 };
 
@@ -24,6 +23,7 @@ struct Node_Block {
 typedef struct Block_Pool Block_Pool;
 struct Block_Pool {
     size_t count;
+    Node_Chunk *alloc;
     Node_Block blocks[BLOCKS_CAPACITY];
 };
 
@@ -43,7 +43,7 @@ int init_block(void)
     for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
         main_pool.blocks[main_pool.count].chunks[j].next = main_pool.blocks[main_pool.count].chunks + j + 1;
     }
-    main_pool.blocks[main_pool.count].alloc = main_pool.blocks[main_pool.count].chunks;
+    main_pool.alloc = main_pool.blocks[main_pool.count].chunks;
     return 0;
 }
 
@@ -58,7 +58,7 @@ Node *node_alloc(void)
             return NULL;
     }
 
-    if (!main_pool.blocks[main_pool.count].alloc) {
+    if (!main_pool.alloc) {
         if (main_pool.count >= BLOCKS_CAPACITY - 1) {
             fprintf(stderr, "ERROR: out of memory!\n");
             return NULL;
@@ -68,9 +68,9 @@ Node *node_alloc(void)
             return NULL;
     }
 
-    Node *new = (Node *) main_pool.blocks[main_pool.count].alloc;
+    Node *new = (Node *) main_pool.alloc;
     Node_Chunk *chunk = (Node_Chunk *) new;
-    main_pool.blocks[main_pool.count].alloc = chunk->next;
+    main_pool.alloc = chunk->next;
     *new = (Node) { .out_iface = NO_IFACE };
     return new;
 }
@@ -80,8 +80,8 @@ Node *node_alloc(void)
  **********************************************************************/
 void node_free(Node *node) {
     Node_Chunk *chunk = (Node_Chunk *) node;
-    chunk->next = (Node_Chunk *) main_pool.blocks[main_pool.count].alloc;
-    main_pool.blocks[main_pool.count].alloc = chunk;
+    chunk->next = (Node_Chunk *) main_pool.alloc;
+    main_pool.alloc = chunk;
 }
 
 /**********************************************************************
