@@ -8,7 +8,35 @@
 
 extern int node_count;
 
-typedef int64_t node_t;
+/**********************************************************************
+ * NODE STRUCTURE
+ * Explanation of the anonymous union: convenience to print the IP
+ *      addresses in CIDR format.
+ * Fields:
+ *  - prefix_length: the length of the IP prefix
+ *  - prefix: the prefix itself (cidr_format represents the same bytes)
+ *  - out_iface: the "next_hop" of the forwarding algorithm.
+ *  - Node *left,*right: left and right subtrees.
+ **********************************************************************/
+typedef struct Node Node;
+struct Node {
+    int prefix_length;
+    union {
+        uint32_t prefix;
+        uint8_t cidr_format[4];
+    };
+    int out_iface;
+    Node *left;
+    Node *right;
+};
+/* Macros for printf */
+#define Node_Fmt "%d.%d.%d.%d/%d"
+#define Node_Args(x) (x).cidr_format[3], \
+(x).cidr_format[2], \
+(x).cidr_format[1], \
+(x).cidr_format[0], \
+(x).prefix_length
+
 
 /**********************************************************************
  * WARNING: THIS FUNCTION ALLOCATES MEMORY
@@ -16,7 +44,7 @@ typedef int64_t node_t;
  * Read the nodes one by one from the FIB, and put them on the tree.
  * No arguments.
  **********************************************************************/
-node_t create_trie();
+Node *create_trie();
 
 /**********************************************************************
  * Free the tree from the root to the leaves.
@@ -27,18 +55,18 @@ void free_nodes(void);
  * Compress a Patricia trie. Get rid of the in-between nodes if they
  * do not correspond to a next hop and they only have one subtree.
  **********************************************************************/
-node_t compress_trie(node_t node);
+Node *compress_trie(Node *node);
 
 /**********************************************************************
  * Look up the next hop corresponding to an IP. Returns 0 if it
  * did not find one.
  * Args:
- *  - node_t root: the absolute root of the trie.
+ *  - Node *root: the absolute root of the trie.
  *  - uint32_t ip: the IP for which to look up a next hop.
  *  - int *accesses: variable declared outside the function to keep
  *  track of the number of memory acesses.
  **********************************************************************/
-int lookup(node_t root, uint32_t ip, int *accesses);
+int lookup(Node *root, uint32_t ip, int *accesses);
 
 /**********************************************************************
  * Wrapper of the above `make_graph` function, in charge of opening
@@ -50,12 +78,12 @@ int lookup(node_t root, uint32_t ip, int *accesses);
  * user code.
  * Args:
  *  - const char *gv_file_path: file path of the graphviz file path.
- *  - node_t root: the relative root of the current tree.
+ *  - Node *root: the relative root of the current tree.
  **********************************************************************/
-int output_graphviz(const char *gv_file_path, node_t root);
+int output_graphviz(const char *gv_file_path, Node *root);
 
 /**********************************************************************
  * Print the trie. OBSOLETE. We cannot see anything with this function
  **********************************************************************/
-void print_trie(FILE *stream, node_t root, int level);
+void print_trie(FILE *stream, Node *root, int level);
 #endif // NODE_H

@@ -58,12 +58,14 @@ int main(int argc, char *argv[])
         printIOExplanationError(result);
         return 1;
     }
-    node_t root = create_trie();
+    Node *root = create_trie();
     if (!root) {
         free_nodes();
         freeIO();
         return 1;
     }
+
+    printf("Finished creating the trie\n");
 
 #ifdef DEBUG
     if (output_graphviz("out_uncompressed.gv", root) < 0) {
