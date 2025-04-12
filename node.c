@@ -19,7 +19,7 @@ struct Node_Block {
     Node_Chunk *chunks;
 };
 
-#define BLOCKS_CAPACITY 1048576
+#define BLOCKS_CAPACITY 24
 typedef struct Block_Pool Block_Pool;
 struct Block_Pool {
     size_t count;
