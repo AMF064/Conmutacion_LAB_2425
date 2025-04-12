@@ -68,8 +68,8 @@ void insert_node(Node *root, Node *new)
 Node *create_trie()
 {
     Node *root = node_alloc();
+    /*for (int i = 0; i < 10; ++i) {*/
     for (;;) {
-    //for (int i = 0; i < 10; ++i) {
         uint32_t prefix = 0;
         int out_iface = 0;
         int pref_len = 0;
@@ -160,12 +160,12 @@ Node* compress_trie(Node *node) {
 int lookup(Node *root, uint32_t ip, int *accesses) {
     int best_iface = NO_IFACE;
     Node *node = root;
-    while (node && best_iface == NO_IFACE) {
+    while (node) {
         *accesses += 1;
         int mask;
         getNetmask(node->prefix_length, (int *)&mask); //utils
 
-         if (node->prefix_length == 0) {
+        if (node->prefix_length == 0) {
             mask = 0x00000000;  // Protege contra desplazamiento ilegal(necesario por funcion getNetmask)
         }
 
