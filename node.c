@@ -21,24 +21,29 @@ struct Node_Block {
 };
 
 #define BLOCKS_CAPACITY 1048576
-static size_t blocks_count = 0;
-static Node_Block main_blocks[BLOCKS_CAPACITY] = {0};
+typedef struct Block_Pool Block_Pool;
+struct Block_Pool {
+    size_t count;
+    Node_Block blocks[BLOCKS_CAPACITY];
+};
+
+static Block_Pool main_pool = {0};
 
 int node_count = 0;
 
 int init_block(void)
 {
-        main_blocks[blocks_count].chunks = malloc(sizeof(Node_Chunk) * DEFAULT_CAPACITY);
-        if (!main_blocks[blocks_count].chunks) {
-            perror("malloc failed");
-            return -1;
-        }
+    main_pool.blocks[main_pool.count].chunks = malloc(sizeof(Node_Chunk) * DEFAULT_CAPACITY);
+    if (!main_pool.blocks[main_pool.count].chunks) {
+        perror("malloc failed");
+        return -1;
+    }
 
-        memset(main_blocks[blocks_count].chunks, 0, sizeof(Node_Chunk) * DEFAULT_CAPACITY);
-        for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
-            main_blocks[blocks_count].chunks[j].next = main_blocks[blocks_count].chunks + j + 1;
-        }
-        main_blocks[blocks_count].alloc = main_blocks[blocks_count].chunks;
+    memset(main_pool.blocks[main_pool.count].chunks, 0, sizeof(Node_Chunk) * DEFAULT_CAPACITY);
+    for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
+        main_pool.blocks[main_pool.count].chunks[j].next = main_pool.blocks[main_pool.count].chunks + j + 1;
+    }
+    main_pool.blocks[main_pool.count].alloc = main_pool.blocks[main_pool.count].chunks;
     return 0;
 }
 
@@ -48,24 +53,24 @@ int init_block(void)
  **********************************************************************/
 Node *node_alloc(void)
 {
-    if (!main_blocks[0].chunks) {
+    if (!main_pool.blocks[0].chunks) {
         if (init_block() < 0)
             return NULL;
     }
 
-    if (!main_blocks[blocks_count].alloc) {
-        if (blocks_count >= BLOCKS_CAPACITY - 1) {
+    if (!main_pool.blocks[main_pool.count].alloc) {
+        if (main_pool.count >= BLOCKS_CAPACITY - 1) {
             fprintf(stderr, "ERROR: out of memory!\n");
             return NULL;
         }
-        blocks_count += 1;
+        main_pool.count += 1;
         if (init_block() < 0)
             return NULL;
     }
 
-    Node *new = (Node *) main_blocks[blocks_count].alloc;
+    Node *new = (Node *) main_pool.blocks[main_pool.count].alloc;
     Node_Chunk *chunk = (Node_Chunk *) new;
-    main_blocks[blocks_count].alloc = chunk->next;
+    main_pool.blocks[main_pool.count].alloc = chunk->next;
     *new = (Node) { .out_iface = NO_IFACE };
     return new;
 }
@@ -75,8 +80,8 @@ Node *node_alloc(void)
  **********************************************************************/
 void node_free(Node *node) {
     Node_Chunk *chunk = (Node_Chunk *) node;
-    chunk->next = (Node_Chunk *) main_blocks[blocks_count].alloc;
-    main_blocks[blocks_count].alloc = chunk;
+    chunk->next = (Node_Chunk *) main_pool.blocks[main_pool.count].alloc;
+    main_pool.blocks[main_pool.count].alloc = chunk;
 }
 
 /**********************************************************************
@@ -170,7 +175,7 @@ Node *create_trie()
 void free_nodes(void)
 {
     for (size_t i = 0; i < BLOCKS_CAPACITY; ++i) {
-        free(main_blocks[i].chunks);
+        free(main_pool.blocks[i].chunks);
     }
 }
 
