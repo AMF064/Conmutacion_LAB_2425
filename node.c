@@ -115,6 +115,7 @@ void print_trie(FILE *stream, Node *root, int level)
 }
 
 /**********************************************************************
+ * RECURSIVE_FUNCTION
  * Compress a Patricia trie. Get rid of the in-between nodes if they
  * do not correspond to a next hop and they only have one subtree.
  **********************************************************************/

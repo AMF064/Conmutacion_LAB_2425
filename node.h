@@ -65,6 +65,7 @@ Node *create_trie();
 void free_nodes(Node *root);
 
 /**********************************************************************
+ * RECURSIVE FUNCTION
  * Compress a Patricia trie. Get rid of the in-between nodes if they
  * do not correspond to a next hop and they only have one subtree.
  **********************************************************************/
