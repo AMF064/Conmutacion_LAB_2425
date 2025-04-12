@@ -5,6 +5,11 @@
 /**********************************************************************
  * MEMORY ALLOCATION: Pool Allocator
  **********************************************************************/
+
+/**********************************************************************
+ * Node chunks are a union between a pointer and a Node, so that they're
+ * the size of the node.
+ **********************************************************************/
 typedef union Node_Chunk Node_Chunk;
 union Node_Chunk {
     Node_Chunk *next;
@@ -40,6 +45,7 @@ int init_block(void)
     }
 
     memset(main_pool.blocks[main_pool.count].chunks, 0, sizeof(Node_Chunk) * DEFAULT_CAPACITY);
+    /* Cross-reference the chunks, so that we can access the next one available in O(1) time */
     for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
         main_pool.blocks[main_pool.count].chunks[j].next = main_pool.blocks[main_pool.count].chunks + j + 1;
     }
