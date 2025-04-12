@@ -65,8 +65,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Finished creating the trie\n");
-
 #ifdef DEBUG
     if (output_graphviz("out_uncompressed.gv", root) < 0) {
         free_nodes();
