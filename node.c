@@ -36,26 +36,20 @@ static Block_Pool main_pool = {0};
 
 int node_count = 0;
 
-int init_memory(void)
+int init_block(void)
 {
-    for (size_t i = 0; i < BLOCKS_CAPACITY; ++i) {
-        main_pool.blocks[i].chunks = malloc(sizeof(Node_Chunk) * DEFAULT_CAPACITY);
-        if (!main_pool.blocks[i].chunks) {
-            perror("malloc failed");
-            return -1;
-        }
+    main_pool.blocks[main_pool.count].chunks = malloc(sizeof(Node_Chunk) * DEFAULT_CAPACITY);
+    if (!main_pool.blocks[main_pool.count].chunks) {
+        perror("malloc failed");
+        return -1;
+    }
 
-        memset(main_pool.blocks[i].chunks, 0, sizeof(Node_Chunk) * DEFAULT_CAPACITY);
-        /* Cross-reference the chunks, so that we can access the next one available in O(1) time */
-        for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
-            main_pool.blocks[i].chunks[j].next = main_pool.blocks[i].chunks + j + 1;
-        }
+    memset(main_pool.blocks[main_pool.count].chunks, 0, sizeof(Node_Chunk) * DEFAULT_CAPACITY);
+    /* Cross-reference the chunks, so that we can access the next one available in O(1) time */
+    for (size_t j = 0; j < DEFAULT_CAPACITY - 1; ++j) {
+        main_pool.blocks[main_pool.count].chunks[j].next = main_pool.blocks[main_pool.count].chunks + j + 1;
     }
-    for (size_t i = 0; i < BLOCKS_CAPACITY - 1; ++i) {
-        main_pool.blocks[i].chunks[DEFAULT_CAPACITY - 1].next = main_pool.blocks[i + 1].chunks;
-    }
-    main_pool.blocks[BLOCKS_CAPACITY - 1].chunks[DEFAULT_CAPACITY - 1].next = NULL;
-    main_pool.alloc = main_pool.blocks[0].chunks;
+    main_pool.alloc = main_pool.blocks[main_pool.count].chunks;
     return 0;
 }
 
@@ -66,13 +60,18 @@ int init_memory(void)
 Node *node_alloc(void)
 {
     if (!main_pool.blocks[0].chunks) {
-        if (init_memory() < 0)
+        if (init_block() < 0)
             return NULL;
     }
 
     if (!main_pool.alloc) {
-        fprintf(stderr, "ERROR: out of memory!\n");
-        return NULL;
+        if (main_pool.count >= BLOCKS_CAPACITY - 1) {
+            fprintf(stderr, "ERROR: out of memory!\n");
+            return NULL;
+        }
+        main_pool.count += 1;
+        if (init_block() < 0)
+            return NULL;
     }
 
     Node *new = (Node *) main_pool.alloc;
