@@ -2,6 +2,14 @@
 #include "io.h"
 #include "utils.h"
 
+#ifndef DEFAULT_CAPACITY
+#define DEFAULT_CAPACITY 4096
+#endif
+
+#ifndef BLOCKS_CAPACITY
+#define BLOCKS_CAPACITY 24
+#endif
+
 struct __node_t {
     uint32_t idx;
     uint32_t offset;
@@ -53,13 +61,11 @@ union Node_Chunk {
 
 /* Linked list of blocks */
 /* Each block is an array of chunks with O(1) access time */
-#define DEFAULT_CAPACITY 4096
 typedef struct Node_Block Node_Block;
 struct Node_Block {
     Node_Chunk *chunks;
 };
 
-#define BLOCKS_CAPACITY 24
 typedef struct Block_Pool Block_Pool;
 struct Block_Pool {
     uint8_t count;
