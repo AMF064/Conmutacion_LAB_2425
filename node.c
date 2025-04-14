@@ -77,21 +77,22 @@ static Block_Pool main_pool = {0};
 
 int node_count = 0;
 
-node_t ptr2idx(Node *node) {
-    if (node == NULL)
+static inline node_t ptr2idx(Node *node)
+{
+    if (!node)
         return -1;
-    struct __node_t idx = { .idx = (uint32_t) (node - (Node *) main_pool.blocks[node->idx_offset].chunks), .offset = (uint32_t) node->idx_offset };
+    struct __node_t idx = { .idx = (uint32_t) (node - (Node *) main_pool.blocks[node->idx_offset].chunks),
+                            .offset = (uint32_t) node->idx_offset };
     /* Reinterpret the bits */
     node_t retval = *(node_t *) &idx;
-    //node_t retval = ((node_t) idx.idx << 32) | (idx.offset);
     return retval;
 }
 
-Node *idx2ptr(node_t node) {
+static inline Node *idx2ptr(node_t node)
+{
     if (node == -1)
         return NULL;
     struct __node_t hidden = *(struct __node_t *) &node;
-    //struct __node_t hidden = { .idx = (node >> 32) & ((1ULL << 32) - 1), .offset = node & ((1ULL << 32) - 1) };
     return (Node *) &main_pool.blocks[hidden.offset].chunks[hidden.idx];
 }
 
@@ -143,7 +144,8 @@ Node *node_alloc(void)
 /**********************************************************************
  * Free a node.
  **********************************************************************/
-void node_free(Node *node) {
+void node_free(Node *node)
+{
     Node_Chunk *chunk = (Node_Chunk *) node;
     chunk->next = (Node_Chunk *) main_pool.alloc;
     main_pool.alloc = chunk;
