@@ -11,8 +11,8 @@
 #endif
 
 struct __node_t {
-    uint32_t idx;
-    uint32_t offset;
+    uint32_t idx : 24;
+    uint8_t offset;
 };
 
 /**********************************************************************

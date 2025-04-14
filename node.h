@@ -8,7 +8,7 @@
 
 extern int node_count;
 
-typedef int64_t node_t;
+typedef int32_t node_t;
 
 /**********************************************************************
  * WARNING: THIS FUNCTION ALLOCATES MEMORY
