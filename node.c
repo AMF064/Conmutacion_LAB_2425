@@ -20,6 +20,7 @@ struct __node_t {
  * Explanation of the anonymous union: convenience to print the IP
  *      addresses in CIDR format.
  * Fields:
+ *  - idx_offset: we need this information for the allocator
  *  - prefix_length: the length of the IP prefix
  *  - prefix: the prefix itself (cidr_format represents the same bytes)
  *  - out_iface: the "next_hop" of the forwarding algorithm.
@@ -27,7 +28,7 @@ struct __node_t {
  **********************************************************************/
 typedef struct Node Node;
 struct Node {
-    uint8_t idx_offset;
+    uint8_t idx_offset;  /* We need this information for the allocator */
     int prefix_length;
     union {
         uint32_t prefix;
