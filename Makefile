@@ -1,6 +1,6 @@
 SRC := my_route_lookup.c io.c utils.c node.c
 INC := io.h utils.h node.h
-CFLAGS = -Wall -Wextra -pedantic -std=c11 -ggdb #-fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare
+CFLAGS = -Wall -Wextra -pedantic -std=c11 -O2 #-ggdb #-fsanitize=address -fsanitize=pointer-subtract -fsanitize=pointer-compare -fsanitize=undefined
 
 all: my_route_lookup
 
