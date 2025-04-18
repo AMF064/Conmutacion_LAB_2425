@@ -2,6 +2,13 @@
 #include "io.h"
 #include "utils.h"
 
+/**********************************************************************
+ * Default values for the number of chunks in a block (DEFAULT_CAPACITY)
+ * and the number of nodes in a pool (BLOCKS_CAPACITY). These values
+ * have been deduced by fixating one of the values and minimizing the
+ * other based on valgrind's output.
+ **********************************************************************/
+
 #ifndef DEFAULT_CAPACITY
 #define DEFAULT_CAPACITY 4096
 #endif
@@ -10,6 +17,17 @@
 #define BLOCKS_CAPACITY 24
 #endif
 
+/**********************************************************************
+ * The internal bit representation of the node_t opaque type. We just
+ * share its size.
+ *
+ * Have in mind that the node_t opaque type acts as a "relative pointer"
+ * to the allocated data inside this translation unit. It is a glorified
+ * array index.
+ *
+ * The size of the structure can be shrinked depending on the data set
+ * of our case. Strictly speaking, for a complete tree,
+ **********************************************************************/
 struct __node_t {
     uint32_t idx : 24;
     uint8_t offset;
@@ -60,13 +78,20 @@ union Node_Chunk {
     Node node;
 };
 
-/* Linked list of blocks */
 /* Each block is an array of chunks with O(1) access time */
 typedef struct Node_Block Node_Block;
 struct Node_Block {
     Node_Chunk *chunks;
 };
 
+/**********************************************************************
+ * Node pool. An array of blocks, with one allocation pointer.
+ * Members:
+ *    - count: number of allocated blocks.
+ *    - alloc: next available chunk in the blocks.
+ *    - blocks: the array of blocks. It is static for simplicity.
+ *    It could be made dynamic without too much effort.
+ **********************************************************************/
 typedef struct Block_Pool Block_Pool;
 struct Block_Pool {
     uint8_t count;
@@ -78,6 +103,10 @@ static Block_Pool main_pool = {0};
 
 int node_count = 0;
 
+/**********************************************************************
+ * Absolute pointer to node_t opaque type conversion.
+ * NULL is reinterpreted as -1.
+ **********************************************************************/
 static inline node_t ptr2idx(Node *node)
 {
     if (!node)
@@ -89,6 +118,10 @@ static inline node_t ptr2idx(Node *node)
     return retval;
 }
 
+/**********************************************************************
+ * node_t opaque type to absolute pointer conversion.
+ * -1 is reinterpreted as NULL.
+ **********************************************************************/
 static inline Node *idx2ptr(node_t node)
 {
     if (node == -1)
@@ -97,6 +130,17 @@ static inline Node *idx2ptr(node_t node)
     return (Node *) &main_pool.blocks[hidden.offset].chunks[hidden.idx];
 }
 
+/**********************************************************************
+ * Initialize another block in the main pool and update the alloc
+ * pointer to use this new block. It is only necessary to call this
+ * function when no blocks have been previously allocated or there is
+ * no more space in the current block.
+ *
+ * THIS IS AN INTERNAL FUNCTION. Only functions defined inside this
+ * translation unit know of its existence.
+ *
+ * RETURNS -1 IN CASE OF AN ERROR.
+ **********************************************************************/
 int init_block(void)
 {
     main_pool.blocks[main_pool.count].chunks = malloc(sizeof(Node_Chunk) * DEFAULT_CAPACITY);
